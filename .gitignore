@@ -1,0 +1,47 @@
+.env
+.env.local
+.env.production
+*.pem
+*.key
+.codex
+
+# ── Python ────────────────────────────────────────
+
+*.py[cod]
+*.pyo
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+app/__pycache__/
+**/__pycache__/
+
+# ── IDE / Editor ──────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Logs ──────────────────────────────────────────
+*.log
+logs/
+
+# ── Node (frontend ko lagi) ───────────────────────
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# ── Database ──────────────────────────────────────
+*.db
+*.sqlite
+
+# ── Testing ───────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+/tests

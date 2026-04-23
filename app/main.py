@@ -1,0 +1,93 @@
+from pathlib import Path
+
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.utils import get_openapi
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+from dotenv import load_dotenv
+
+# .env loading logic
+env_path = Path(__file__).resolve().parent.parent / '.env'
+load_dotenv(dotenv_path=env_path)
+
+from app.api.routes import auth, papers, reports, search
+
+app = FastAPI(title="Research Agent API")
+BASE_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = BASE_DIR / "frontend"
+STATIC_DIR = FRONTEND_DIR
+INDEX_FILE = FRONTEND_DIR / "html" / "index.html"
+NODE_MODULES_DIR = BASE_DIR / "node_modules"
+
+# Updated Middleware with Bypass for Localhost
+@app.middleware("http")
+async def api_key_middleware(request: Request, call_next):
+    # Authentication is temporarily disabled to simplify retrieval testing.
+    response = await call_next(request)
+    path = request.url.path
+
+    if path in {"/", "/index.html", "/workspace", "/workspace/search"} or path.startswith("/js/") or path.startswith("/css/"):
+        response.headers["Cache-Control"] = "no-store, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+
+    return response
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Routers
+app.include_router(auth.router, tags=["Auth"])
+app.include_router(papers.router, tags=["Papers"])
+app.include_router(reports.router, tags=["Reports"])
+app.include_router(search.router, tags=["Search"])
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+app.mount("/css", StaticFiles(directory=FRONTEND_DIR / "css"), name="frontend-css")
+app.mount("/js", StaticFiles(directory=FRONTEND_DIR / "js"), name="frontend-js")
+if NODE_MODULES_DIR.exists():
+    app.mount("/vendor", StaticFiles(directory=NODE_MODULES_DIR), name="vendor-node-modules")
+
+# Custom OpenAPI
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="Research Agent API",
+        version="1.0.0",
+        routes=app.routes,
+    )
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
+
+@app.get("/", include_in_schema=False)
+def frontend():
+    return FileResponse(INDEX_FILE)
+
+
+@app.get("/index.html", include_in_schema=False)
+def frontend_index():
+    return FileResponse(INDEX_FILE)
+
+
+@app.get("/workspace", include_in_schema=False)
+def frontend_workspace():
+    return FileResponse(INDEX_FILE)
+
+
+@app.get("/workspace/search", include_in_schema=False)
+def frontend_workspace_search():
+    return FileResponse(INDEX_FILE)
+
+
+@app.get("/health", tags=["Health"])
+def home():
+    return {"message": "Research Agent API running"}

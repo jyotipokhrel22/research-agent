@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="ra-api-base" content="" />
+  <title>Research Agent</title>
+  <script>
+    (function () {
+      var mode = window.location.pathname.indexOf('/workspace') === 0 ? 'workspace' : 'landing';
+      document.documentElement.setAttribute('data-route-mode', mode);
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="landing-state" x-data="appShell()" x-init="init()" :class="$store.app.mode === 'workspace' ? 'workspace-state' : 'landing-state'">
+  <div class="bg-grid"></div>
+
+  <section id="landing-page" x-show="$store.app.mode === 'landing'">
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="logo">
+          <span>Research Agent</span>
+        </div>
+        <div class="nav-links">
+          <a href="#features">Features</a>
+          <a href="#workflow">Workflow</a>
+        </div>
+        <div class="nav-actions">
+          <button class="btn btn-outline theme-toggle-btn" type="button" aria-label="Toggle theme" @click="$store.app.toggleTheme()">
+            <span class="sun-icon" x-cloak x-show="$store.app.theme === 'dark'">☀</span>
+            <span class="moon-icon" x-cloak x-show="$store.app.theme === 'light'">☾</span>
+          </button>
+          <button id="get-started-btn" class="btn btn-primary" type="button" @click="$store.app.openWorkspace()">Open workspace</button>
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="hero-copy">
+        <div class="badge">Research gap discovery from literature</div>
+        <h1 class="hero-title">Find research gaps, faster.</h1>
+        <p class="hero-subtitle">
+          Enter a topic, optionally filter by year or venue, retrieve papers, and surface clear research directions.
+        </p>
+        <div class="hero-cta">
+          <button id="get-started-btn-hero" class="btn btn-primary" type="button" @click="$store.app.openWorkspace()">Open workspace</button>
+          <a class="btn btn-secondary" href="#features">See details</a>
+        </div>
+      </div>
+
+      <div class="hero-panel">
+        <div class="hero-panel-header">
+          <span class="panel-kicker">Pipeline</span>
+          <span class="panel-route">topic → papers → gaps</span>
+        </div>
+
+        <div class="query-preview">
+          <span class="query-label">Topic</span>
+          <div class="query-value">multi agent rl</div>
+        </div>
+
+        <div class="filter-strip">
+          <div class="filter-pill">
+            <span class="filter-pill-label">Year</span>
+            <span class="filter-pill-value">Optional filter</span>
+          </div>
+          <div class="filter-pill">
+            <span class="filter-pill-label">Venue</span>
+            <span class="filter-pill-value">Optional filter</span>
+          </div>
+          <div class="filter-pill">
+            <span class="filter-pill-label">Output</span>
+            <span class="filter-pill-value">Gaps + directions</span>
+          </div>
+        </div>
+
+        <div class="panel-block">
+          <div class="panel-block-head">
+            <span>Retrieval sources</span>
+            <span>3</span>
+          </div>
+          <div class="source-row">
+            <div class="source-chip">Semantic Scholar</div>
+            <div class="source-chip">arXiv</div>
+            <div class="source-chip">Tavily</div>
+          </div>
+        </div>
+
+        <div class="panel-block">
+          <div class="panel-block-head">
+            <span>Agent output</span>
+            <span>Structured synthesis</span>
+          </div>
+          <div class="result-preview-inline">
+            Literature Agent ranks papers, extracts limitations, and surfaces actionable research gaps.
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-marquee" aria-hidden="true">
+        <div class="hero-marquee-track">
+          <span class="hero-marquee-item arxiv">arXiv</span>
+          <span class="hero-marquee-item semantic">Semantic Scholar</span>
+          <span class="hero-marquee-item tavily">Tavily</span>
+          <span class="hero-marquee-item arxiv">arXiv</span>
+          <span class="hero-marquee-item semantic">Semantic Scholar</span>
+          <span class="hero-marquee-item tavily">Tavily</span>
+          <span class="hero-marquee-item arxiv">arXiv</span>
+          <span class="hero-marquee-item semantic">Semantic Scholar</span>
+          <span class="hero-marquee-item tavily">Tavily</span>
+        </div>
+      </div>
+    </header>
+
+    <section id="features" class="features-section">
+      <div class="section-heading fade-in visible">
+        <span class="section-kicker">What the system does</span>
+        <h2>From literature retrieval to research directions.</h2>
+      </div>
+      <div class="features-grid">
+        <article class="feature-card fade-in visible">
+          <h3>Priority-based retrieval</h3>
+          <p>Search starts from Semantic Scholar, falls back to arXiv, and uses Tavily only when broader web retrieval is needed.</p>
+        </article>
+        <article class="feature-card fade-in visible delay-1">
+          <h3>Structured extraction</h3>
+          <p>Each selected paper is summarized into methods, findings, and limitations so analysis stays comparable across sources.</p>
+        </article>
+        <article class="feature-card fade-in visible delay-2">
+          <h3>Gap generation</h3>
+          <p>The system synthesizes repeated weaknesses across papers and turns them into concrete research gaps and suggested next directions.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="workflow" class="workflow-strip fade-in visible">
+      <div class="workflow-step">
+        <span class="workflow-index">01</span>
+        <p>Enter a topic with optional year or venue filters.</p>
+      </div>
+      <div class="workflow-step">
+        <span class="workflow-index">02</span>
+        <p>Retrieve and rank a limited set of relevant English-language papers.</p>
+      </div>
+      <div class="workflow-step">
+        <span class="workflow-index">03</span>
+        <p>Review summaries, research gaps, and suggested research directions.</p>
+      </div>
+    </section>
+  </section>
+
+  <main id="app-container" class="px-theme" x-show="$store.app.mode === 'workspace'">
+    <aside id="app-sidebar" class="px-sidebar" :class="{ collapsed: $store.app.sidebarCollapsed }" x-data="historySidebar()">
+      <div class="sidebar-top">
+        <button id="new-thread-btn" class="btn-new-thread" type="button" @click="$store.app.startNewSearch()">New search</button>
+        <button id="close-sidebar" class="btn-icon mobile-only" type="button" aria-label="Close sidebar" @click="$store.app.closeSidebar()">✕</button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Recent searches</div>
+        <div id="search-history">
+          <template x-if="!$store.app.history.length">
+            <div class="px-history-item">No searches yet</div>
+          </template>
+          <template x-for="item in $store.app.history" :key="item.id">
+            <button type="button" class="px-history-item history-button" @click="open(item)">
+              <strong x-text="item.topic"></strong>
+              <span x-text="item.summary"></span>
+            </button>
+          </template>
+        </div>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="user-row">
+          <div class="avatar-small">RA</div>
+          <span>Research Agent</span>
+        </div>
+      </div>
+    </aside>
+
+    <section class="px-main">
+      <header class="px-header">
+        <button id="open-sidebar" class="btn-icon mobile-only" type="button" aria-label="Open sidebar" @click="$store.app.openSidebar()">☰</button>
+        <div class="header-actions">
+          <button class="btn-icon theme-toggle-btn" type="button" aria-label="Toggle theme" @click="$store.app.toggleTheme()">
+            <span class="sun-icon" x-cloak x-show="$store.app.theme === 'dark'">☀</span>
+            <span class="moon-icon" x-cloak x-show="$store.app.theme === 'light'">☾</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="px-content">
+        <section id="initial-view" class="px-initial-view" x-show="$store.app.currentView === 'form'">
+          <h1 class="px-logo-text">What research topic do you want to explore?</h1>
+          <div class="px-input-container">
+            <form class="px-input-box search-form-shell" x-data="searchForm()" @submit.prevent="submit" @keydown.meta.enter.prevent="submit" @keydown.ctrl.enter.prevent="submit">
+              <label class="sr-only" for="main-prompt">Topic</label>
+              <textarea id="main-prompt" rows="3" placeholder="Try: multi agent rl" x-model="$store.app.form.topic"></textarea>
+
+              <div class="filter-grid">
+                <label class="filter-field" for="year-filter">
+                  <span class="filter-label">Year or range</span>
+                  <input id="year-filter" type="text" inputmode="text" placeholder="Optional, e.g. 2025 or 2023-2026" x-model="$store.app.form.year" />
+                </label>
+                <label class="filter-field" for="venue-filter">
+                  <span class="filter-label">Venue</span>
+                  <input id="venue-filter" type="text" placeholder="Optional, e.g. icml" x-model="$store.app.form.venue" />
+                </label>
+                <label class="filter-field" for="max-results-filter">
+                  <span class="filter-label">Max results</span>
+                  <input id="max-results-filter" type="number" min="1" max="20" inputmode="numeric" x-model.number="$store.app.form.maxResults" />
+                </label>
+              </div>
+
+              <div class="px-input-actions">
+                <div class="px-action-left">
+                  <span class="input-contract-note">Only topic is required</span>
+                </div>
+                <button id="run-px-query" class="px-submit-btn" type="submit" aria-label="Run search" :class="{ 'is-loading': $store.app.isLoading }" :disabled="$store.app.isLoading" x-text="$store.app.isLoading ? '…' : '➜'"></button>
+              </div>
+            </form>
+            <p id="search-error" class="search-error" x-cloak x-show="$store.app.error" x-text="$store.app.error"></p>
+          </div>
+        </section>
+
+        <section id="thread-view" class="px-thread-view" x-data="resultsPage()" x-cloak x-show="$store.app.currentView === 'results'">
+          <div class="px-user-query">
+            <h2 id="thread-query-title" x-text="title()">Search results</h2>
+            <p id="thread-query-meta" class="thread-query-meta" x-text="meta()"></p>
+          </div>
+
+          <div class="px-answer compact-results-shell">
+            <section class="compact-results-section" aria-labelledby="papers-section-title">
+              <div class="compact-section-header">
+                <div>
+                  <h3 id="papers-section-title" class="compact-section-title">Papers</h3>
+                </div>
+              </div>
+              <div id="results-list" class="results-list compact-results-list">
+                <template x-if="$store.app.isLoading">
+                  <div class="empty-results-card compact-empty-card">
+                    <h3>Searching papers</h3>
+                    <p>Retrieving literature and preparing the evidence view.</p>
+                  </div>
+                </template>
+                <template x-if="!$store.app.isLoading && !papers().length">
+                  <div class="empty-results-card compact-empty-card">
+                    <h3>No papers found</h3>
+                    <p>Try broadening the topic or removing one of the optional filters.</p>
+                  </div>
+                </template>
+                <template x-for="(paper, index) in papers()" :key="paper.external_id || paper.url || paper.title">
+                  <article class="paper-card compact-paper-card">
+                    <div class="compact-paper-index" x-text="index + 1"></div>
+                    <div class="compact-paper-body">
+                      <h3 x-text="paper.title"></h3>
+                      <p class="compact-paper-meta">
+                        <span x-text="paper.venue || 'Unknown venue'"></span>
+                        <span> · </span>
+                        <span x-text="paper.year || 'Unknown year'"></span>
+                      </p>
+                    </div>
+                    <div class="compact-paper-side">
+                      <span class="compact-paper-source" x-text="sourceLabel(paper.source)"></span>
+                      <template x-if="paperLink(paper)">
+                        <a class="paper-link compact-paper-link" :href="paperLink(paper)" target="_blank" rel="noopener noreferrer">Open</a>
+                      </template>
+                    </div>
+                  </article>
+                </template>
+              </div>
+            </section>
+
+            <section class="compact-results-section" aria-labelledby="gaps-section-title">
+              <div class="compact-section-header">
+                <div>
+                  <h3 id="gaps-section-title" class="compact-section-title">Research gaps</h3>
+                </div>
+              </div>
+              <div id="gaps-list" class="gaps-list">
+                <template x-if="$store.app.isLoading">
+                  <div class="empty-results-card compact-empty-card">
+                    <h3>Analyzing evidence</h3>
+                    <p>Scoring recurring limitations, assumptions, and evaluation weaknesses.</p>
+                  </div>
+                </template>
+                <template x-if="!$store.app.isLoading && !gaps().length">
+                  <div class="empty-results-card compact-empty-card">
+                    <h3>No gaps found</h3>
+                    <p>The current evidence did not surface a strong recurring gap for this query.</p>
+                  </div>
+                </template>
+                <template x-for="(gap, index) in gaps()" :key="gap.gap_id || `${gap.title}-${index}`">
+                  <article class="gap-card" x-data="{ open: false }">
+                    <div class="gap-card-head">
+                      <span class="gap-rank" x-text="index + 1"></span>
+                      <div class="gap-card-title-block">
+                        <h3 x-text="gap.title"></h3>
+                        <p class="gap-category" x-text="gap.category.replace(/_/g, ' ')"></p>
+                      </div>
+                    </div>
+
+                    <p class="gap-statement" x-text="gap.statement"></p>
+                    <p class="gap-why" x-show="gap.why_it_matters" x-text="gap.why_it_matters"></p>
+
+                    <div class="gap-score-row">
+                      <span class="gap-pill" x-text="supportCountLabel(gap)"></span>
+                      <span class="gap-pill" x-show="gap.overall_score" x-text="scoreLabel(gap.overall_score)"></span>
+                    </div>
+
+                    <div class="gap-action-box" x-show="gap.actionable_opportunity">
+                      <div class="gap-action-label">Suggested direction</div>
+                      <p x-text="gap.actionable_opportunity"></p>
+                    </div>
+
+                    <button class="gap-evidence-toggle" type="button" @click="open = !open" x-text="open ? 'Hide evidence' : 'Show evidence'"></button>
+
+                    <div class="gap-evidence" x-cloak x-show="open" x-collapse>
+                      <div class="gap-evidence-stats">
+                        <span class="gap-mini-stat" x-text="supportCountLabel(gap)"></span>
+                        <span class="gap-mini-stat" x-text="recentCountLabel(gap)"></span>
+                        <span class="gap-mini-stat" x-text="influentialCountLabel(gap)"></span>
+                      </div>
+
+                      <template x-if="evidenceTags(gap).length">
+                        <div class="gap-tag-grid">
+                          <template x-for="tag in evidenceTags(gap)" :key="`${gap.gap_id}-${tag.label}-${tag.value}`">
+                            <span class="gap-tag"><strong x-text="tag.label"></strong><span x-text="tag.value"></span></span>
+                          </template>
+                        </div>
+                      </template>
+
+                      <template x-if="supportingPapers(gap).length">
+                        <div class="gap-support-block">
+                          <div class="gap-support-title">Supporting papers</div>
+                          <div class="gap-support-list">
+                            <template x-for="paper in supportingPapers(gap)" :key="paper.paper_id || paper.title">
+                              <div class="gap-support-item">
+                                <div class="gap-support-heading">
+                                  <span class="gap-support-paper" x-text="paper.title"></span>
+                                  <span class="gap-support-meta" x-text="supportingPaperMeta(paper)"></span>
+                                </div>
+                              </div>
+                            </template>
+                          </div>
+                        </div>
+                      </template>
+                    </div>
+                  </article>
+                </template>
+              </div>
+            </section>
+          </div>
+
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script src="/js/api.js?v=20260417a"></script>
+  <script src="/js/search.js?v=20260417a"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+  <script defer src="/vendor/@alpinejs/collapse/dist/cdn.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.14.9/dist/cdn.min.js'"></script>
+  <script defer src="/js/alpine/stores/appStore.js?v=20260423a"></script>
+  <script defer src="/js/alpine/components/searchForm.js?v=20260423a"></script>
+  <script defer src="/js/alpine/components/resultsPage.js?v=20260423a"></script>
+  <script defer src="/js/alpine/components/historySidebar.js?v=20260423a"></script>
+  <script defer src="/js/alpine/app.js?v=20260423a"></script>
+  <script defer src="/vendor/alpinejs/dist/cdn.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js'"></script>
+</body>
+</html>

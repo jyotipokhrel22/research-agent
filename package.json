@@ -1,0 +1,14 @@
+{
+  "name": "research-agent-frontend",
+  "private": true,
+  "dependencies": {
+    "@alpinejs/collapse": "^3.14.9",
+    "alpinejs": "^3.14.9"
+  },
+  "scripts": {
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0"
+  }
+}
