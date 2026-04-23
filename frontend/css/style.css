@@ -573,6 +573,12 @@ body.landing-state .px-theme {
     pointer-events: none;
 }
 
+html[data-route-mode='workspace'] body.landing-state .px-theme {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
 body.workspace-state #landing-page {
     display: none;
 }

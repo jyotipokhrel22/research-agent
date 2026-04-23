@@ -10,7 +10,7 @@ document.addEventListener('alpine:init', () => {
             const paperCount = searchData?.count ?? searchData?.papers?.length ?? 0;
 
             if (this.$store.app.isLoading) {
-                return 'Preparing literature view';
+                return 'Tracing papers, evaluating evidence, and preparing a gap brief';
             }
 
             return filters.length
@@ -24,6 +24,59 @@ document.addEventListener('alpine:init', () => {
 
         gaps() {
             return this.$store.app.result?.gapData?.gaps || [];
+        },
+
+        thinkingSteps() {
+            const activeStage = this.$store.app.loadingStage;
+            const order = ['query', 'retrieval', 'analysis', 'synthesis'];
+            const labels = {
+                query: {
+                    title: 'Understanding your query',
+                    detail: 'Normalizing topic, year, and venue filters before dispatch.',
+                },
+                retrieval: {
+                    title: 'Searching the literature',
+                    detail: 'Querying retrieval sources and deduplicating candidate papers.',
+                },
+                analysis: {
+                    title: 'Reviewing evidence',
+                    detail: 'Scanning limitations, assumptions, datasets, and evaluation signals.',
+                },
+                synthesis: {
+                    title: 'Drafting research gaps',
+                    detail: 'Ranking the most defensible gaps and packaging the final view.',
+                },
+            };
+
+            return order.map((stage, index) => {
+                const activeIndex = order.indexOf(activeStage);
+                let status = 'pending';
+                if (activeStage === 'complete' || index < activeIndex) {
+                    status = 'complete';
+                } else if (index === activeIndex) {
+                    status = 'active';
+                }
+
+                return {
+                    key: stage,
+                    status,
+                    ...labels[stage],
+                };
+            });
+        },
+
+        thinkingSummary() {
+            const stage = this.$store.app.loadingStage;
+            if (stage === 'retrieval') {
+                return 'Gathering candidate papers from the configured sources.';
+            }
+            if (stage === 'analysis') {
+                return 'Looking for recurring weaknesses and evidence patterns across the retrieved papers.';
+            }
+            if (stage === 'synthesis') {
+                return 'Scoring the strongest gaps and preparing the final thread.';
+            }
+            return 'Turning your query into a structured research brief.';
         },
 
         paperLink(paper) {

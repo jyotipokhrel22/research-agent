@@ -183,7 +183,12 @@
 
     <section class="px-main">
       <header class="px-header">
-        <button id="open-sidebar" class="btn-icon mobile-only" type="button" aria-label="Open sidebar" @click="$store.app.openSidebar()">☰</button>
+        <div class="workspace-toolbar">
+          <button id="toggle-sidebar" class="btn-icon sidebar-toggle-btn" type="button" aria-label="Toggle history sidebar" @click="$store.app.toggleSidebar()">
+            <span x-text="$store.app.sidebarCollapsed ? '☰' : '✕'"></span>
+          </button>
+          <span class="workspace-toolbar-label">History</span>
+        </div>
         <div class="header-actions">
           <button class="btn-icon theme-toggle-btn" type="button" aria-label="Toggle theme" @click="$store.app.toggleTheme()">
             <span class="sun-icon" x-cloak x-show="$store.app.theme === 'dark'">☀</span>
@@ -232,6 +237,37 @@
             <p id="thread-query-meta" class="thread-query-meta" x-text="meta()"></p>
           </div>
 
+          <section class="thinking-shell" x-cloak x-show="$store.app.isLoading">
+            <div class="thinking-head">
+              <div>
+                <div class="thinking-kicker">Thinking</div>
+                <h3>Working through the query</h3>
+              </div>
+              <div class="thinking-pulse">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <p class="thinking-summary" x-text="thinkingSummary()"></p>
+            <div class="thinking-steps">
+              <template x-for="step in thinkingSteps()" :key="step.key">
+                <div class="thinking-step" :class="`is-${step.status}`">
+                  <div class="thinking-step-icon">
+                    <span x-show="step.status === 'complete'">✓</span>
+                    <span x-show="step.status === 'active'">•</span>
+                    <span x-show="step.status === 'pending'">·</span>
+                  </div>
+                  <div class="thinking-step-copy">
+                    <div class="thinking-step-title" x-text="step.title"></div>
+                    <p class="thinking-step-detail" x-text="step.detail"></p>
+                  </div>
+                  <div class="thinking-step-status" x-text="step.status === 'complete' ? 'Done' : (step.status === 'active' ? 'Working' : 'Queued')"></div>
+                </div>
+              </template>
+            </div>
+          </section>
+
           <div class="px-answer compact-results-shell">
             <section class="compact-results-section" aria-labelledby="papers-section-title">
               <div class="compact-section-header">
@@ -241,9 +277,9 @@
               </div>
               <div id="results-list" class="results-list compact-results-list">
                 <template x-if="$store.app.isLoading">
-                  <div class="empty-results-card compact-empty-card">
-                    <h3>Searching papers</h3>
-                    <p>Retrieving literature and preparing the evidence view.</p>
+                  <div class="empty-results-card compact-empty-card loading-placeholder-card">
+                    <h3>Paper list is on the way</h3>
+                    <p>The retriever is still collecting and ranking candidate papers for this query.</p>
                   </div>
                 </template>
                 <template x-if="!$store.app.isLoading && !papers().length">
@@ -282,9 +318,9 @@
               </div>
               <div id="gaps-list" class="gaps-list">
                 <template x-if="$store.app.isLoading">
-                  <div class="empty-results-card compact-empty-card">
-                    <h3>Analyzing evidence</h3>
-                    <p>Scoring recurring limitations, assumptions, and evaluation weaknesses.</p>
+                  <div class="empty-results-card compact-empty-card loading-placeholder-card">
+                    <h3>Gap synthesis is running</h3>
+                    <p>The analyzer is still scoring limitations, assumptions, and evaluation blind spots.</p>
                   </div>
                 </template>
                 <template x-if="!$store.app.isLoading && !gaps().length">
